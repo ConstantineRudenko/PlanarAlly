@@ -8,7 +8,6 @@ import { ToolMode, ToolName } from "../../models/tools";
 import { accessState } from "../../systems/access/state";
 import { gameSystem } from "../../systems/game";
 import { gameState } from "../../systems/game/state";
-import { labelState } from "../../systems/labels/state";
 import { roomState } from "../../systems/room/state";
 import { playerSettingsState } from "../../systems/settings/players/state";
 import { activeModeTools, activeTool, activeToolMode, dmTools, toggleActiveMode, toolMap } from "../../tools/tools";
@@ -16,7 +15,6 @@ import { initiativeStore } from "../initiative/state";
 
 import DiceTool from "./DiceTool.vue";
 import DrawTool from "./DrawTool.vue";
-import FilterTool from "./FilterTool.vue";
 import MapTool from "./MapTool.vue";
 import RulerTool from "./RulerTool.vue";
 import SelectTool from "./SelectTool.vue";
@@ -33,9 +31,7 @@ const visibleTools = computed(() => {
         for (const [toolName] of activeModeTools.value) {
             if (dmTools.includes(toolName) && !gameState.reactive.isDm) continue;
 
-            if (toolName === ToolName.Filter) {
-                if (labelState.reactive.labels.size === 0) continue;
-            } else if (toolName === ToolName.Vision) {
+            if (toolName === ToolName.Vision) {
                 if (accessState.reactive.ownedTokens.size <= 1) continue;
             } else if (toolName === ToolName.Dice) {
                 if (!roomState.reactive.enableDice) continue;
@@ -106,17 +102,17 @@ function toggleFakePlayer(): void {
                 <div v-if="gameState.isDmOrFake.value" id="tool-status-toggles">
                     <div
                         :class="{ active: gameState.reactive.isFakePlayer }"
-                        title="Toggle fake-player"
+                        :title="t('game.ui.tools.tools.FP_title')"
                         @click="toggleFakePlayer"
                     >
-                        FP
+                        {{ t("game.ui.tools.tools.FP") }}
                     </div>
                     <div
                         :class="{ active: initiativeStore.state.isActive }"
-                        title="Toggle Initiative State"
+                        :title="t('game.ui.tools.tools.INI_title')"
                         @click="initiativeStore.toggleActive"
                     >
-                        INI
+                        {{ t("game.ui.tools.tools.INI") }}
                     </div>
                 </div>
                 <div style="flex-grow: 1"></div>
@@ -131,7 +127,6 @@ function toggleFakePlayer(): void {
             <DrawTool v-lazy-show="activeTool === ToolName.Draw" />
             <RulerTool v-lazy-show="activeTool === ToolName.Ruler" />
             <MapTool v-lazy-show="activeTool === ToolName.Map" />
-            <FilterTool v-lazy-show="activeTool === ToolName.Filter" />
             <VisionTool v-lazy-show="activeTool === ToolName.Vision" />
             <DiceTool v-lazy-show="roomState.reactive.enableDice && activeTool === ToolName.Dice" />
         </div>
